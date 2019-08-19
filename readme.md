@@ -34,9 +34,10 @@ To use this, you'll want to do the following on your Zero:
     * Note that this includes Pimoroni's unicorn-hat Python libraries: https://github.com/pimoroni/unicorn-hat
 
 5) Also:
-    * Copy the code found in the unicorn directory of this repo to `/var/unicorn/unicorn`
-    * Copy the code found in the `init.d` directory of this repo to `/etc/init.d`
     * Copy the contents of `config.json` file from the `homebridge` directory into `/var/homebridge`
+    * Install system daemons for homebridge and unicorn (this software)
+        * Copy the files `homebridge` and `unicorn` from the `init.d` directory to `/etc/init.d`
+        * `sudo systemctl daemon-reload`
 
 
 ## License
