@@ -4,6 +4,14 @@ This is a collection of Python code that I run on some Raspberry Pi Zero's to
 convert 3D printed things into functional lamps that integrate perfection with
 Apple's Siri and the iOS Home app.
 
+You can see a video of this code in action here: https://youtu.be/6jC8ryEkgvQ.
+
+> Notice: I wrote this code to make 3D printed lamps, but it probably has other
+> uses. If you're interested in the 3D printed projects you can find my *"8-bit"
+> Diamond Ore Lamp* project here: https://www.prusaprinters.org/prints/5175-8-bit-minecraft-diamond-ore-lamp-siri-enabled
+> or here: https://www.thingiverse.com/thing:3817997.
+
+
 I started here: https://learn.pimoroni.com/tutorial/sandyj/using-mote-with-homekit-and-siri
 but this repo includes significant improvements over the code suggested there.
 

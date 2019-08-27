@@ -27,8 +27,10 @@ pyparsing==2.4.2          # via packaging
 pytest-cov==2.7.1
 pytest-mock==1.10.4
 pytest==4.6.5
+rpi-ws281x==4.2.2         # via unicornhat
 scandir==1.10.0           # via pathlib2
 six==1.12.0               # via mock, more-itertools, packaging, pathlib2, pip-tools, pytest
+unicornhat==2.2.3
 wcwidth==0.1.7            # via pytest
 werkzeug==0.15.5          # via flask
 zipp==0.5.2               # via importlib-metadata

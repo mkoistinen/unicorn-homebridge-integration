@@ -10,8 +10,8 @@
 ### END INIT INFO
 
 dir="/var/unicorn"
-cmd="sudo /var/unicorn/venv/bin/python -m unicorn.api"
-user="unicorn"
+cmd="/var/unicorn/venv/bin/python -m unicorn.api"
+user="root"
 
 name=`basename $0`
 pid_file="/var/run/$name.pid"

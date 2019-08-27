@@ -1,6 +1,7 @@
 NOTE: If you plan to install more than one of homebridge device on your network
 you will need to ensure that each has a unique "username", "pin", and "name" as
-defined in the "bridge" section of the `config.json` file.
+defined in the "bridge" section of the `config.json` file. Also, define a unique
+"name" in the "accessories" section too.
 
 It is suggested that to determine a unique "username" is to use your devices
 MAC address in all uppercase hexidecimal. You can find this easily with:
