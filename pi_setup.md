@@ -20,19 +20,26 @@ Via host computer, create another file `/ssh` that is empty.
 
 Eject SD card, put into Pi, boot up!
 
-Log into device (Find IP address in DHCP tables).
+Log into device using its default zero-conf name:
 
-`ssh pi@[ipaddress]`
+`ssh pi@raspberrypi.local`
 
 Immediately change the default password to something stronger.
 
 `passwd`
 
+## Update hostname
+`ifconfig -a`
+
+Examine the last 4 hex digits in the WLAN0's HW address, replace the following
+'X's accordingly:
+`sudo cat "unicorn_XXXX" > /etc/hostname
+
 
 ## Setup SSH
-mkdir .ssh
 
-Via another terminal: `cp ~/.ssh/zero_pub pi@[IPADDRESS]:/.ssh/authorized_keys` (check that you can now log in via SSH)
+`mkdir .ssh`
+Via another terminal: `cp ~/.ssh/zero.pub pi@[IPADDRESS]:/.ssh/authorized_keys` (check that you can now log in via SSH)
 
 
 ## Update System
@@ -45,7 +52,7 @@ Now install fail2ban! (and htop, you'll love it)
 
 `sudo apt-get update`
 `sudo apt-get install htop fail2ban`
-`cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local`
+`sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local`
 
 `sudo reboot`
 
@@ -66,7 +73,7 @@ Configure system using: `sudo raspi-config`
 Check to see which version is latest first!
 
 `curl -o node-v11.9.0-linux-armv6.tar.gz https://nodejs.org/dist/v11.9.0/node-v11.9.0-linux-armv6l.tar.gz`
-
+`tar -xzf node-v11.9.0-linux-armv6.tar.gz`
 `sudo cp -r node-v11.9.0-linux-armv6l/* /usr/local/`
 
 ## Setup System Users
@@ -77,6 +84,8 @@ Check to see which version is latest first!
 `sudo mkdir /var/unicorn`
 `sudo chown homebridge:homebridge /var/homebridge`
 `sudo chown unicorn:unicorn /var/unicorn`
+`sudo usermod -d /var/unicorn unicorn`
+`sudo usermod -d /var/homebridge homebridge`
 
 ## Install unicorn-homebridge-integration
 `cd /var/unicorn`
@@ -85,8 +94,8 @@ Check to see which version is latest first!
 ### Copy init scripts to system locations
 Copy the daemons to the right place:
 
-`sudo cp init.d/homebridge /etc/init.d/`
-`sudo cp init.d/unicorn /etc/init.d/`
+`sudo su root -c "cp ./init.d/homebridge /etc/init.d/"`
+`sudo su root -c "cp ./init.d/unicorn /etc/init.d/"`
 
 Register the daemons:
 
@@ -114,3 +123,51 @@ Note, these are installed globally.
 ### Install requirements
 This installs the code as a module
 `sudo su unicorn -c "source venv/bin/activate && pip install -e unicorn/."`
+
+
+## If HW button also installed (on GPIO23)
+
+Install Access Point packages
+Create new service: unicorn-configuration-mode (from file in repo)
+Add to rc2.d
+
+`cd /home/pi`
+`git clone https://github.com/WiringPi/WiringPi.git`
+
+`sudo cp /etc/dhcpcd.conf /etc/dhcpcd.ap.conf`
+`sudo cp /etc/dhcpcd.conf /etc/dhcpcd.normal.conf`
+
+Update dhcpcd.ap.conf for AP mode
+Modify /etc/init.d/hostapd
+
+`cd /etc/cd2.d`
+`sudo rm S01hostapd`
+`sudo rm S01dhcpcd`
+`sudo ln -s ../init.d/unicorn-configuration-mode S01unicorn-configuration-mode`
+
+
+### Install dnsmasq hostapd
+sudo apt install dnsmasq hostapd
+sudo systemctl stop dnsmasq
+sudo systemctl stop hostapd
+
+#### Make 2 DHCPCD Service configurations
+
+Copy the dhcpcd.conf into 2 different files, and symlink the normal one
+
+`sudo cp /etc/dhcpcd.conf /etc/dhcpcd.ap.conf`
+`sudo vi /etc/dhcpcd.ap.conf`
+`sudo mv /etc/dhcpcd.conf /etc/dhcpcd.normal.conf`
+`sudo ln -s /etc/dhcpcd.normal.conf /etc/dhcpcd.conf`
+
+#### Configure DNSMASQ
+sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
+sudo vi /etc/dnsmasq.conf
+
+#### Configure HOSTAPD
+sudo vi /etc/hostapd/hostapd.conf
+sudo vi /etc/default/hostapd
+
+sudo systemctl unmask hostapd
+sudo systemctl enable hostapd
+sudo systemctl start hostapd

@@ -1,0 +1,65 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          unicorn-configuration-mode
+# Required-Start:    
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Sets Unicorn Configuration Mode
+# Description:       Depending on the state of GPIO 23, create or
+#                    remove a file to denote the desired Unicorn
+#                    Configuration Mode. If GPIO 23 is HIGH, then
+#                    the file exists, otherwise it does not.
+### END INIT INFO
+
+set -e
+
+MODEFILE=/tmp/unicorn-configuration-mode
+
+unset_mode() {
+    echo "Removing Unicorn Configuration Mode file if present"
+    if [ -f $MODEFILE ]; then
+        rm $MODEFILE
+    fi
+}
+
+if [ -f /bin/setupcon ]; then
+    case "$1" in
+        status)
+            if [ -f "$MODEFILE" ]; then
+                echo "Unicorn Configuration Mode active."
+                exit 0
+            else
+                echo "Unicorn Configuration  Mode not active."
+                exit 1
+            fi
+            ;;
+        start)
+            # NOTE: Uses WiringPI from https://github.com/WiringPi/WiringPi
+            # Sets a pull down resistor so we don't have to bother with an
+            # additional, external resistor
+            /usr/local/bin/gpio -g mode 23 down
+            /usr/local/bin/gpio -g mode 23 in
+    	    VAL="$(/usr/local/bin/gpio -g read 23)"
+            if [ $VAL -eq 1 ]; then
+                echo "Creating Unicorn Configuration Mode file @ ${MODEFILE}"
+                touch $MODEFILE
+		rm /etc/dhcpcd.conf
+		ln -s /etc/dhcpcd.ap.conf /etc/dhcpcd.conf
+	    else
+	        unset_mode
+		rm /etc/dhcpcd.conf
+                ln -s /etc/dhcpcd.normal.conf /etc/dhcpcd.conf
+            fi
+	    ;;
+	stop)
+	    unset_mode
+	    exit 0
+            ;;
+        *)
+            echo "Usage: /etc/init.d/unicorn-configuration-mode {start|stop|status}"
+            exit 3
+            ;;
+    esac
+fi
