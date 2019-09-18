@@ -1,5 +1,8 @@
 coverage==4.5.4
 Flask==1.1.1
+Flask-Bootstrap>=3.3.7.0
+flask-nav==0.6
+Flask-WTF>=0.14.0
 mock==3.0.5
 pip-tools==4.0.0
 pytest==4.6.5

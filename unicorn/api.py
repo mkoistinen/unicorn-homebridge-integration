@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, jsonify, make_response
+import os
+
+from flask import Flask, jsonify, make_response, render_template, request, flash
+from flask_bootstrap import Bootstrap
+
 try:
     import unicornhat as uh
 except ImportError:
@@ -11,11 +15,23 @@ from color import Color
 from effects.candle_light import CandleLight
 from effects.ocean_boat_blue import OceanBoatBlue
 from effects.rainbow import Rainbow
+from forms import ConfigureWifiForm
 from unicorn import Unicorn
 
 
-app = Flask('unicorn')
+app = Flask('unicorn', static_folder="static_dir")
+app.config.update(
+    BOOTSTRAP_SERVE_LOCAL=True,
+    SECRET_KEY=os.urandom(32),
+)
 logger = app.logger
+Bootstrap(app)
+
+from flask_nav import Nav
+from flask_nav.elements import Navbar, View
+nav = Nav()
+
+
 medium_cyan = Color(hex="007F7F")  # Siri color: "Aqua"
 
 # Initialize the lamp to medium-brightness "Aqua" (Siri's name for this color)
@@ -96,6 +112,38 @@ def set_off():
     """
     unicorn.set_status(False)
     return OK
+
+
+@nav.navigation()
+def navbar():
+    return Navbar(
+        'Unicorn Lamp',
+        View('Home', 'home'),
+        View('Wifi', 'configure_wifi'),
+    )
+
+
+nav.init_app(app)
+
+
+@app.route('/config', methods=['GET', 'POST', ])
+def home():
+    """
+    """
+    return render_template('config/home.html')
+
+
+@app.route('/config/wifi', methods=['GET', 'POST', ])
+def configure_wifi():
+    """
+    Presents a form to collect details about the Wifi to connect to.
+    Once POSTed and validated, details will update /boot/wpa_supplicant.conf
+    Then, once the lamp is restarted, the OS will use those settings.
+    """
+    form = ConfigureWifiForm()
+    if form.validate_on_submit():
+        return 'Wifi Credentials Saved.'
+    return render_template('config/wifi.html', form=form)
 
 
 @app.errorhandler(404)

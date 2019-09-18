@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+Configuration: Wifi
+{% endblock %}
+
+{% block content %}
+    {{ super() }}
+    <div class="container">
+        <div class="row">
+            <h2>Wi-Fi Configuration</h2>
+            <p class="text-muted">Connect your lamp to your local wifi network</p>
+            <form method="post">
+                {{ form.csrf_token }}
+                {{ wtf.form_field(form.ssid) }}
+                {{ wtf.form_field(form.password) }}
+                {{ wtf.form_field(form.security_mode) }}
+                <div class="col xs-col-12">
+                    <input class="btn btn-primary" id="submit" type="submit" value="Submit">
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
