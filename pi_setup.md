@@ -5,6 +5,8 @@ These instructions were written for Raspian Buster Kernel version 4.19 released 
 ## Gain access to Zero
 Via host computer, put Raspian image on SD card (balenaEtcher is a good recommendation)
 
+After balenaEtcher has completed you may be notified that the drive needs to be formatted if using Windows. You must click on No if you get this pop up. Also if using Windows Eject the MicroSD card and reinsert it before continuing.
+
 Via host computer, create a file `/wpa_supplicant.conf` that contains:
 
     country=US
