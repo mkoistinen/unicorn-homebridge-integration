@@ -1,6 +1,6 @@
 # Prepping new Pi Zero:
 
-These instructions were written for Raspian Buster Kernel version 4.19 released 2019-09-26
+These instructions were written for Raspberry Pi OS Lite Kernel version 5.10 released March 4th, 2021
 
 ## Gain access to Zero
 Via host computer, put Raspian image on SD card (balenaEtcher is a good recommendation)
@@ -37,24 +37,55 @@ Immediately change the default password to something stronger.
 Examine the last 4 hex digits in the WLAN0's HW address, replace the following
 'X's accordingly:
 
-    sudo cat "unicornXXXX" > /etc/hostname
+    sudo su -c 'echo unicornXXXX > /etc/hostname'
+
+Also, change the hosts file to reflect this change by doing:
+
+    sudo vi /etc/hosts
+
+And edit the line that contains `rasberrypi` to contain your hostname (be sure
+to change the `XXXX` accordingly):
+
+    ...
+    127.0.0.1        unicornXXXX
+    ...
+
 
 
 ## Setup SSH
 
+This section is optional, but will help you set up and use RSA key pairs to log
+into the Pi Zero going forward. You can choose to not do this, and continue to
+use your login credentials defined earlier.
+
     mkdir .ssh
 
-Via another terminal check that you can now log in via SSH:
+From your host, copy your public key to the Pi Zero. In this example, my RSA 
+key is called `zero`, so the public key portion is `zero.pub`, obviously, use 
+your own key's filename here.
 
-    scp ~/.ssh/zero.pub pi@[IPADDRESS]:/.ssh/authorized_keys
+    scp ~/.ssh/zero.pub pi@[IPADDRESS]:.ssh/authorized_keys
+
+Now, back on the Zero, set the permissions correctly:
+
+    chmod 700 ~/.ssh
+    chmod 600 ~/.ssh/authorized_keys
+
+Now, back on your host computer, in a new terminal, verify you can log in with
+your RSA keys:
+
+    ssh -i ~/.ssh/zero pi@[IPADDRESS]
+
+At this point you have *added convenience*, and *reduced security* because you
+now have 2 methods of logging in: one using a password, and one using an RSA
+key. Consider now disabling the weaker method of password authentication. There
+are numerous resources online for this. It's easy to do too!
 
 
 ## Update System
 
     sudo apt-get update
     sudo apt-get -y upgrade
-
-The above will take like 20 minutes!
 
 Now install fail2ban, git, and pip.
 
@@ -72,18 +103,25 @@ Configure system using:
 
     sudo raspi-config
 
-1. Localization -> Locale: "en-US" (use your own, of course)
-2. Localization -> Time Zones:
-3. Localization -> Keyboard:
-4. Advanced -> Expand filesystem (reboot again)
+1. Localisation Options -> Locale: "en-US" (use your own, of course)
+2. Localization Options -> Time Zones: (choose your own, of course)
+3. Localization Options -> Keyboard: (choose your own, of course)
+4. Advanced Options -> Expand Filesystem (reboot again)
 
 
 ## Install Node
-Check to see which version is latest first!
+Check to see which version is latest for your system first! In my case, on my
+Pi Zero, when I do:
 
-    curl -o node-v11.9.0-linux-armv6.tar.gz https://nodejs.org/dist/v11.9.0/node-v11.9.0-linux-armv6l.tar.gz
-    tar -xzf node-v11.9.0-linux-armv6.tar.gz
-    sudo cp -r node-v11.9.0-linux-armv6l/* /usr/local/
+    more /proc/cpuinfo
+
+I see that this is an ARMv6-compatible processor, so, I need to find the latest
+version of node that supports this. At the time of this writing (April, 2021),
+this appears to be v11.15.0. So, these are the commands I need to run:
+
+    curl -o node-v11.15.0-linux-armv6l.tar.gz https://nodejs.org/dist/v11.15.0/node-v11.15.0-linux-armv6l.tar.gz
+    tar -xzf node-v11.15.0-linux-armv6l.tar.gz
+    sudo cp -r node-v11.15.0-linux-armv6l/* /usr/local/
 
 ## Setup System Users
 
@@ -120,6 +158,10 @@ Note, these are installed globally.
     sudo npm install -g --unsafe-perm homebridge
     sudo npm install -g --unsafe-perm homebridge-better-http-rgb
 
+NOTE: At the time of this writing (April, 2021), the homebridge-better-http-rgb
+package has been deprecated, but it still installs and works.
+
+
 ### Copy config.json
 
     sudo cp /var/unicorn/unicorn/homebridge/config.json /var/homebridge/
@@ -134,12 +176,15 @@ Note, these are installed globally.
     sudo su unicorn -c "virtualenv venv"
 
 ### Install requirements
+
 This installs the code as a module
 
     sudo su unicorn -c "source venv/bin/activate && pip install -e unicorn/."
 
+Reboot, and you're done!
 
-## If HW button also installed (on GPIO23)
+
+## Proceed only if HW button also installed (on GPIO23) (This feature is not yet complete nor supported)
 
 Install Access Point packages
 Create new service: unicorn-configuration-mode (from file in repo)
