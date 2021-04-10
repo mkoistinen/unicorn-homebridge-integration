@@ -8,8 +8,10 @@ Configuration: Menu
     {{ super() }}
     <div class="container">
         <div class="row">
-            <h2>Your Lamp</h2>
-            <p>Your lamp should be <a href="{{ url_for('configure_wifi') }}">connected to your network</a> to function correctly with the iOS Home app.</p>
+            <div class="col-xs-12">
+                <h2>Your Lamp</h2>
+                <p>Your lamp should be <a href="{{ url_for('configure_wifi') }}">connected to your network</a> to function correctly with the iOS Home app.</p>
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -46,7 +46,7 @@ Examine the last 4 hex digits in the WLAN0's HW address, replace the following
 
 Via another terminal check that you can now log in via SSH:
 
-    cp ~/.ssh/zero.pub pi@[IPADDRESS]:/.ssh/authorized_keys
+    scp ~/.ssh/zero.pub pi@[IPADDRESS]:/.ssh/authorized_keys
 
 
 ## Update System
@@ -56,10 +56,10 @@ Via another terminal check that you can now log in via SSH:
 
 The above will take like 20 minutes!
 
-Now install fail2ban! (and htop, you'll love it)
+Now install fail2ban, git, and pip.
 
     sudo apt-get update
-    sudo apt-get install htop fail2ban
+    sudo apt-get install fail2ban git python-pip
     sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 
     sudo reboot
@@ -72,11 +72,10 @@ Configure system using:
 
     sudo raspi-config
 
-1. Hostname "zero194"
-2. Locale: "en-US" (use your own, of course)
-3. Time Zones:
-4. Keyboard:
-5. Expand filesystem (reboot again)
+1. Localization -> Locale: "en-US" (use your own, of course)
+2. Localization -> Time Zones:
+3. Localization -> Keyboard:
+4. Advanced -> Expand filesystem (reboot again)
 
 
 ## Install Node
@@ -106,15 +105,15 @@ Check to see which version is latest first!
 ### Copy init scripts to system locations
 Copy the daemons to the right place:
 
-    sudo su root -c "cp ./init.d/homebridge /etc/init.d/"
-    sudo su root -c "cp ./init.d/unicorn /etc/init.d/"
+    sudo su root -c "cp /var/unicorn/unicorn/init.d/homebridge /etc/init.d/"
+    sudo su root -c "cp /var/unicorn/unicorn/init.d/unicorn /etc/init.d/"
 
 Register the daemons:
 
     sudo update-rc.d homebridge defaults
     sudo update-rc.d unicorn defaults
 
-## Install Homebridge Node packate Requirements
+## Install Homebridge Node package Requirements
 
 Note, these are installed globally.
 
