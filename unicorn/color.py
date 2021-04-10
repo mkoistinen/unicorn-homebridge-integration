@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from utils import bracket, hex_to_rgb, hsv_to_rgb, rgb_to_hsv
+from .utils import bracket, hex_to_rgb, hsv_to_rgb, rgb_to_hsv
 
 
 class Color:
