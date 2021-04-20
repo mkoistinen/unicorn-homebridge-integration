@@ -19,7 +19,7 @@ setup(
         'Flask>=1.1.1',
         'mock>=3.0.5',
         'pip-tools>=4.0.0',
-        'py==1.8.0',
+        'py==1.10.0',
         'pyparsing==2.4.2',
         # 'pytest>=4.6.5',
         # 'pytest-cov>=2.7.1',
